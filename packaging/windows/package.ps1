@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Build, sign and package DesignCraft for Windows.
+  Build, sign and package DesignKoja for Windows.
 
 .DESCRIPTION
   Produces, in $env:DIST (default: dist/release):
@@ -53,7 +53,7 @@ New-Item -ItemType Directory -Force -Path $Dist | Out-Null
 if (-not $env:DESIGNCRAFT_BUILD_SHA) { $env:DESIGNCRAFT_BUILD_SHA = (git -C $Root rev-parse HEAD 2>$null) }
 if (-not $env:DESIGNCRAFT_BUILD_DATE) { $env:DESIGNCRAFT_BUILD_DATE = (Get-Date).ToUniversalTime().ToString('yyyy-MM-dd') }
 
-Write-Output "DesignCraft $Version for Windows $Arch ($Target)"
+Write-Output "DesignKoja $Version for Windows $Arch ($Target)"
 
 if (-not $SkipBuild) {
   # Static CRT: no VC++ redistributable needed. Scoped to the target so host build scripts and
@@ -106,11 +106,11 @@ $Portable = Join-Path $TargetDir "windows-package\designcraft-$Version-windows-$
 Remove-Item -Recurse -Force $Portable -ErrorAction SilentlyContinue
 New-Item -ItemType Directory -Force -Path $Portable | Out-Null
 Copy-Item (Join-Path $Stage '*.exe') $Portable
-# The marker that makes DesignCraft keep its data in .\DesignCraftData next to the exe instead of
+# The marker that makes DesignKoja keep its data in .\DesignCraftData next to the exe instead of
 # %APPDATA% (#574; see apps/designcraft/src/profile.rs).
 Set-Content -Encoding ascii -Path (Join-Path $Portable 'portable.txt') -Value @(
-  'DesignCraft portable: preferences, logs and crash recovery are kept in the DesignCraftData folder',
-  'next to designcraft.exe. Delete this file to use %APPDATA%\DesignCraft instead.'
+  'DesignKoja portable: preferences, logs and crash recovery are kept in the DesignCraftData folder',
+  'next to designcraft.exe. Delete this file to use %APPDATA%\DesignKoja instead.'
 )
 foreach ($f in 'README.md', 'LICENSE', 'LICENSE-MIT', 'LICENSE-APACHE') {
   $p = Join-Path $Root $f

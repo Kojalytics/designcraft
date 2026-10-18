@@ -27,9 +27,9 @@ pub const VERSION: u32 = 3;
 
 #[derive(Debug, thiserror::Error)]
 pub enum FormatError {
-    #[error("not a DesignCraft document: {0}")]
+    #[error("not a DesignKoja document: {0}")]
     NotOurs(String),
-    #[error("document is from a newer DesignCraft (format {0}); please update")]
+    #[error("document is from a newer DesignKoja (format {0}); please update")]
     TooNew(u64),
     #[error("{0}")]
     Io(String),
@@ -88,7 +88,7 @@ fn save_with_large_entries_from(doc: &Document, preview: Option<&[u8]>, large_en
         // documents without EPS stay at 2 so their existing readers keep working; writing 1
         // would make a reader re-run the version 2 paragraph upgrade over current defaults.
         let version = if doc.assets.values().any(|a| designcraft_images::is_eps(&a.data)) { VERSION } else { 2 };
-        let meta = json!({"format": "designcraft", "version": version, "generator": concat!("DesignCraft ", env!("CARGO_PKG_VERSION"))});
+        let meta = json!({"format": "designcraft", "version": version, "generator": concat!("DesignKoja ", env!("CARGO_PKG_VERSION"))});
         z.write_all(meta.to_string().as_bytes()).map_err(|e| FormatError::Io(e.to_string()))?;
         if let Some(png) = preview {
             z.start_file(PREVIEW, stored).map_err(io)?;

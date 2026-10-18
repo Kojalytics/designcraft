@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build, sign and (optionally) notarize the macOS release artifacts:
 #
-#   $DIST/designcraft-<version>-macos-<arch>.dmg          DesignCraft.app on a drag-to-Applications DMG
+#   $DIST/designcraft-<version>-macos-<arch>.dmg          DesignKoja.app on a drag-to-Applications DMG
 #   $DIST/designcraft-cli-<version>-macos-<arch>.zip      the headless CLI
 #
 # Usage: packaging/macos/package.sh [--arch universal|aarch64|x86_64] [--skip-build]
@@ -39,20 +39,20 @@ export MACOSX_DEPLOYMENT_TARGET=11.0
 IDENTITY="${MACOS_SIGN_IDENTITY:--}"
 SHORT_VERSION="${VERSION%%-*}"
 WORK="$CARGO_TARGET_DIR/macos-package"
-APP="$WORK/DesignCraft.app"
+APP="$WORK/DesignKoja.app"
 DMG="$DIST/designcraft-$VERSION-macos-$ARCH.dmg"
 CLI_ZIP="$DIST/designcraft-cli-$VERSION-macos-$ARCH.zip"
 
 NOTARIZE=0
 if [ "$IDENTITY" = "-" ]; then
   warn "macOS: ad-hoc signing (no MACOS_SIGN_IDENTITY); artifacts are not notarized"
-elif [ -n "${APPLE_ID:-}" ] && [ -n "${APPLE_PASSWORD:-}" ] && [ -n "${APPLE_TEAM_ID:-}" ]; then
+elif [ -n "${NOTARY_PROFILE:-}" ] || { [ -n "${APPLE_ID:-}" ] && [ -n "${APPLE_PASSWORD:-}" ] && [ -n "${APPLE_TEAM_ID:-}" ]; }; then
   NOTARIZE=1
 else
   warn "macOS: APPLE_ID / APPLE_PASSWORD / APPLE_TEAM_ID incomplete; signed but not notarized"
 fi
 
-echo "==> DesignCraft $VERSION for macOS ($ARCH), identity: $IDENTITY, notarize: $NOTARIZE"
+echo "==> DesignKoja $VERSION for macOS ($ARCH), identity: $IDENTITY, notarize: $NOTARIZE"
 
 # ---- build -------------------------------------------------------------------------------------
 if [ "$SKIP_BUILD" = 0 ]; then
@@ -82,27 +82,39 @@ sign() {
 
 notarize() {
   local file="$1" out id status
+  # NOTARY_PROFILE: a Keychain profile from `xcrun notarytool store-credentials` (no password in env).
+  local auth=(--apple-id "${APPLE_ID:-}" --password "${APPLE_PASSWORD:-}" --team-id "${APPLE_TEAM_ID:-}")
+  [ -n "${NOTARY_PROFILE:-}" ] && auth=(--keychain-profile "$NOTARY_PROFILE")
   echo "==> notarizing $(basename "$file") (this can take a few minutes)"
-  out="$(xcrun notarytool submit "$file" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" \
-    --team-id "$APPLE_TEAM_ID" --wait --timeout 1h --output-format json)" || true
+  out="$(xcrun notarytool submit "$file" "${auth[@]}" --output-format json)" || true
   echo "$out"
   id="$(printf '%s' "$out" | plutil -extract id raw -o - - 2>/dev/null || true)"
-  status="$(printf '%s' "$out" | plutil -extract status raw -o - - 2>/dev/null || true)"
+  status=""
+  # Apple can take long (a new account: an hour or more). A dropped connection only ends this
+  # wait, not the submission, so ask again.
+  for _ in 1 2 3 4 5 6; do
+    [ -n "$id" ] || break
+    out="$(xcrun notarytool wait "$id" "${auth[@]}" --timeout 1h --output-format json)" || true
+    echo "$out"
+    status="$(printf '%s' "$out" | plutil -extract status raw -o - - 2>/dev/null || true)"
+    case "$status" in Accepted | Invalid | Rejected) break ;; esac
+    sleep 30
+  done
   if [ "$status" != "Accepted" ]; then
     if [ -n "$id" ]; then
-      xcrun notarytool log "$id" --apple-id "$APPLE_ID" --password "$APPLE_PASSWORD" --team-id "$APPLE_TEAM_ID" || true
+      xcrun notarytool log "$id" "${auth[@]}" || true
     fi
     echo "error: notarization of $(basename "$file") failed (status: ${status:-unknown})" >&2
     exit 1
   fi
 }
 
-# ---- DesignCraft.app ----------------------------------------------------------------------------
+# ---- DesignKoja.app ----------------------------------------------------------------------------
 echo "==> assembling $APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 # Executable and icon carry the display name (CFBundleExecutable / CFBundleIconFile).
-cp "$WORK/bin/designcraft" "$APP/Contents/MacOS/DesignCraft"
-cp "$ROOT/assets/app-icon/designcraft.icns" "$APP/Contents/Resources/DesignCraft.icns"
+cp "$WORK/bin/designcraft" "$APP/Contents/MacOS/DesignKoja"
+cp "$ROOT/assets/app-icon/designcraft.icns" "$APP/Contents/Resources/DesignKoja.icns"
 # Licences of the embedded craft-fonts fonts (only when built with CRAFT_FONTS_DIR).
 copy_font_licences "$APP/Contents/Resources"
 sed -e "s/@VERSION@/$VERSION/g" -e "s/@SHORT_VERSION@/$SHORT_VERSION/g" \
@@ -113,13 +125,13 @@ printf 'APPL????' >"$APP/Contents/PkgInfo"
 
 # Sign inside-out: nested code first, then the bundle itself (no --deep on the final signature).
 # Today the only nested code is the main executable; frameworks/helpers would be signed here too.
-sign --options runtime --entitlements "$HERE/entitlements.plist" "$APP/Contents/MacOS/DesignCraft"
+sign --options runtime --entitlements "$HERE/entitlements.plist" "$APP/Contents/MacOS/DesignKoja"
 sign --options runtime --entitlements "$HERE/entitlements.plist" "$APP"
 codesign --verify --strict --deep --verbose=2 "$APP"
 
 if [ "$NOTARIZE" = 1 ]; then
-  ditto -c -k --keepParent "$APP" "$WORK/DesignCraft-notarize.zip"
-  notarize "$WORK/DesignCraft-notarize.zip"
+  ditto -c -k --keepParent "$APP" "$WORK/DesignKoja-notarize.zip"
+  notarize "$WORK/DesignKoja-notarize.zip"
   xcrun stapler staple "$APP"
   xcrun stapler validate "$APP"
   spctl --assess --type execute -vvv "$APP"
@@ -129,7 +141,7 @@ fi
 echo "==> building $DMG"
 STAGE="$WORK/dmg"
 mkdir -p "$STAGE"
-ditto "$APP" "$STAGE/DesignCraft.app"
+ditto "$APP" "$STAGE/DesignKoja.app"
 ln -s /Applications "$STAGE/Applications"
 # Finder window layout: background, icon size and positions (packaging/macos/dmg/README.md).
 mkdir -p "$STAGE/.background"
@@ -138,8 +150,8 @@ cp "$HERE/dmg/dmg-layout.DS_Store" "$STAGE/.DS_Store"
 rm -f "$DMG"
 # `hdiutil create -srcfolder` writes the files as they are. `makehybrid -hfs` gave every file a
 # com.apple.FinderInfo, which `codesign --verify --strict` rejects as "Finder information, or
-# similar detritus" on the app in the image and on a copy installed from it (as VectorCraft's
-# storytold/vectorcraft#1085 and PdfCraft's storytold/pdfcraft#823). `create` attaches a device
+# similar detritus" on the app in the image and on a copy installed from it (as VectorKoja's
+# Kojalytics/vectorcraft#1085 and PdfKoja's Kojalytics/pdfcraft#823). `create` attaches a device
 # while it copies, which fails now and then on CI runners ("Resource busy"), so it gets a few
 # tries. The volume name has no version: .DS_Store finds the background through an alias that
 # includes it.
@@ -156,7 +168,7 @@ hdiutil_retry() {
     sleep $((attempt * 10))
   done
 }
-hdiutil_retry create create -srcfolder "$STAGE" -volname "DesignCraft" -fs HFS+ -format UDZO -imagekey zlib-level=9 -ov "$DMG"
+hdiutil_retry create create -srcfolder "$STAGE" -volname "DesignKoja" -fs HFS+ -format UDZO -imagekey zlib-level=9 -ov "$DMG"
 sign "$DMG"
 codesign --verify --strict --verbose=2 "$DMG"
 # The app inside the image must still pass --strict, so a makehybrid-style regression can't ship.
@@ -164,7 +176,7 @@ MOUNT="$WORK/dmg-check"
 rm -rf "$MOUNT"
 mkdir -p "$MOUNT"
 hdiutil_retry attach attach -nobrowse -readonly -mountpoint "$MOUNT" "$DMG" >/dev/null
-if ! codesign --verify --strict --deep --verbose=2 "$MOUNT/DesignCraft.app"; then
+if ! codesign --verify --strict --deep --verbose=2 "$MOUNT/DesignKoja.app"; then
   hdiutil_retry detach detach "$MOUNT" >/dev/null || true
   exit 1
 fi

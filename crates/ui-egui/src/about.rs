@@ -1,30 +1,28 @@
 //! Help › About DesignCraft: tabs About · Contributors · Models. About is the splash with the
-//! ArtCraft mark, version, and community links (Discord first and largest), plus the other ArtCraft
+//! ArtCraft mark, version, and community links, plus the other ArtCraft
 //! apps; Contributors and Models are the compiled-in credits (`crate::credits`).
 
 use designcraft_engine::links;
-use egui::{Color32, Rect, Sense, Stroke, pos2, vec2};
+use egui::{Color32, Rect, Sense, pos2, vec2};
 use serde_json::json;
 
 use crate::DesignApp;
 use crate::theme::{Tokens, semibold};
 
-/// ArtCraft brand blue (from `docs/brand/artcraft-mark.svg`).
+/// ArtCraft brand blue (from `docs/brand/kojalytics-mark.svg`).
 pub const BRAND: Color32 = Color32::from_rgb(0x4e, 0x7b, 0xfb);
-/// Discord's brand colour, used for the "Join our Discord" buttons (colour only; no Discord artwork).
-pub const DISCORD: Color32 = Color32::from_rgb(0x58, 0x65, 0xf2);
 
-/// The ArtCraft mark outline (viewBox -10 -19.42 136.34 136.34), from `docs/brand/artcraft-mark.svg`.
+/// The ArtCraft mark outline (viewBox -10 -19.42 136.34 136.34), from `docs/brand/kojalytics-mark.svg`.
 const MARK_PATH: &str = "M104.28,49.49L81.55,0h-31.23l-3.17,4.76L14.75,53.63,0,75.85l21.55,21.55,63.79-36.94,16.99,37.04,14.01-21.74-12.06-26.27ZM32.89,65.66l32.42-48.87,10.91,23.77-43.32,25.09Z";
 
 /// The other ArtCraft apps (app-page slug, name, what it is) — same list as the README.
 pub const SIBLINGS: &[(&str, &str, &str)] = &[
-    ("photocraft", "PhotoCraft", "image editing"),
-    ("vectorcraft", "VectorCraft", "vector illustration"),
-    ("filmcraft", "FilmCraft", "video editing, color and sound"),
-    ("lightcraft", "LightCraft", "photo library and raw development"),
-    ("pdfcraft", "PdfCraft", "reading, organizing and protecting PDFs"),
-    ("effectcraft", "EffectCraft", "motion graphics and visual effects"),
+    ("photocraft", "PhotoKoja", "image editing"),
+    ("vectorcraft", "VectorKoja", "vector illustration"),
+    ("filmcraft", "FilmKoja", "video editing, color and sound"),
+    ("lightcraft", "LightKoja", "photo library and raw development"),
+    ("pdfcraft", "PdfKoja", "reading, organizing and protecting PDFs"),
+    ("effectcraft", "EffectKoja", "motion graphics and visual effects"),
 ];
 
 /// The About window's tabs, in `UiState::about_tab` order (`help.about {tab}` names them in lowercase).
@@ -59,38 +57,6 @@ pub fn paint_mark(ui: &egui::Ui, rect: Rect, color: Color32) {
     let side = rect.width().min(rect.height());
     let r = Rect::from_center_size(rect.center(), vec2(side, side));
     ui.painter().image(tex.id(), r, Rect::from_min_max(pos2(0.0, 0.0), pos2(1.0, 1.0)), Color32::WHITE);
-}
-
-/// A speech-bubble glyph (drawn in code) for Discord buttons.
-pub fn paint_chat_icon(p: &egui::Painter, c: egui::Pos2, s: f32, color: Color32) {
-    let body = Rect::from_center_size(c - vec2(0.0, s * 0.06), vec2(s, s * 0.72));
-    p.rect_filled(body, s * 0.24, color);
-    let tail = vec![
-        pos2(body.left() + s * 0.22, body.bottom() - 1.0),
-        pos2(body.left() + s * 0.12, body.bottom() + s * 0.24),
-        pos2(body.left() + s * 0.44, body.bottom() - 1.0),
-    ];
-    p.add(egui::Shape::convex_polygon(tail, color, Stroke::NONE));
-    let eye = s * 0.09;
-    let bg = if color.r() as u32 + color.g() as u32 + color.b() as u32 > 380 { DISCORD } else { Color32::WHITE };
-    p.circle_filled(body.center() - vec2(s * 0.18, 0.0), eye, bg);
-    p.circle_filled(body.center() + vec2(s * 0.18, 0.0), eye, bg);
-}
-
-/// The big "Join our Discord" button. Returns true when clicked.
-pub fn discord_button(ui: &mut egui::Ui, label: &str, size: egui::Vec2) -> bool {
-    let (r, resp) = ui.allocate_exact_size(size, Sense::click());
-    let resp = resp.on_hover_text(links::DISCORD).on_hover_cursor(egui::CursorIcon::PointingHand);
-    let fill = if resp.hovered() { Color32::from_rgb(0x47, 0x52, 0xc4) } else { DISCORD };
-    ui.painter().rect_filled(r, size.y / 2.0, fill);
-    let icon = size.y * 0.5;
-    let font = semibold((size.y * 0.42).max(11.0));
-    let galley = crate::rtl::plain(ui.ctx(), label, font, Color32::WHITE);
-    let total = icon + 8.0 + galley.size().x;
-    let x0 = r.center().x - total / 2.0;
-    paint_chat_icon(ui.painter(), pos2(x0 + icon / 2.0, r.center().y), icon, Color32::WHITE);
-    ui.painter().galley(pos2(x0 + icon + 8.0, r.center().y - galley.size().y / 2.0), galley, Color32::WHITE);
-    resp.clicked()
 }
 
 /// A text link that opens `url`. Returns true when clicked.
@@ -152,7 +118,7 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
             ui.add_space(6.0);
             ui.label(crate::rtl::widget(
                 ui,
-                egui::RichText::new(crate::i18n::tr(&app.ui.language, "DesignCraft")).font(semibold(26.0)).color(t.text_strong),
+                egui::RichText::new(crate::i18n::tr(&app.ui.language, "DesignKoja")).font(semibold(26.0)).color(t.text_strong),
             ));
             crate::rtl::label(
                 ui,
@@ -169,29 +135,16 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
             ));
             ui.label(crate::rtl::widget(
                 ui,
-                egui::RichText::new(crate::i18n::tr(&app.ui.language, "Part of the ArtCraft suite of open creative tools."))
+                egui::RichText::new("Published by Kojalytics. Based on DesignCraft by the ArtCraft team.")
                     .size(12.0)
                     .color(t.text_dim),
             ));
             ui.add_space(16.0);
-            if discord_button(ui, crate::i18n::tr(&app.ui.language, "Join the ArtCraft Discord"), vec2(300.0, 40.0)) {
-                open = Some("discord");
-            }
-            ui.add_space(4.0);
-            ui.label(crate::rtl::widget(
-                ui,
-                egui::RichText::new(crate::i18n::tr(&app.ui.language, "discord.gg/artcraft — help, feedback and show-and-tell"))
-                    .size(11.0)
-                    .color(t.text_dim),
-            ));
-            ui.add_space(14.0);
             ui.horizontal(|ui| {
                 // Centre the row of links.
-                let w = 330.0;
+                let w = 270.0;
                 ui.add_space(((ui.available_width() - w) / 2.0).max(0.0));
-                for (text, key) in
-                    [("DesignCraft page", "appPage"), ("GitHub", "github"), ("getartcraft.com", "website"), ("Report an issue", "issues")]
-                {
+                for (text, key) in [("DesignKoja page", "appPage"), ("kojalytics.com", "website"), ("Report an issue", "issues")] {
                     if link(ui, crate::i18n::tr(&app.ui.language, text), links::get(key).unwrap_or_default(), t.accent) {
                         open = Some(key);
                     }
@@ -203,7 +156,7 @@ pub fn show(app: &mut DesignApp, ctx: &egui::Context) {
             ui.add_space(6.0);
             ui.label(crate::rtl::widget(
                 ui,
-                egui::RichText::new(crate::i18n::tr(&app.ui.language, "More ArtCraft apps")).font(semibold(12.0)).color(t.text_strong),
+                egui::RichText::new(crate::i18n::tr(&app.ui.language, "More Kojalytics apps")).font(semibold(12.0)).color(t.text_strong),
             ));
             ui.add_space(4.0);
             ui.horizontal(|ui| {

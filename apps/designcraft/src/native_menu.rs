@@ -71,7 +71,7 @@ impl NativeMenu {
         let mut recent = None;
         // Application menu: our own About splash (with the community links) instead of the stock
         // panel, and Settings… (Edit › Preferences… on the other platforms).
-        let app_menu = Submenu::new("DesignCraft", true);
+        let app_menu = Submenu::new("DesignKoja", true);
         for entry in menus::MAC_APP_MENU {
             let _ = match *entry {
                 AppMenuItem::Cmd { id, label, command } => {

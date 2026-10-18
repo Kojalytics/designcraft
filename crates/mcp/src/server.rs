@@ -134,13 +134,11 @@ impl Server {
                 Ok(json!({
                     "protocolVersion": version,
                     "capabilities": {"tools": {}, "resources": {}},
-                    "serverInfo": {"name": "designcraft", "title": "DesignCraft", "version": env!("CARGO_PKG_VERSION"), "websiteUrl": designcraft_engine::links::APP_PAGE},
+                    "serverInfo": {"name": "designcraft", "title": "DesignKoja", "version": env!("CARGO_PKG_VERSION"), "websiteUrl": designcraft_engine::links::APP_PAGE},
                     "instructions": format!(
-                        "{INSTRUCTIONS} Backend: {}. Community: {} (Discord), {} (app page), {} (source). The `app.links` command returns these links.",
+                        "{INSTRUCTIONS} Backend: {}. Website: {} (app page). The `app.links` command returns the project links.",
                         self.backend.describe(),
-                        designcraft_engine::links::DISCORD,
-                        designcraft_engine::links::APP_PAGE,
-                        designcraft_engine::links::GITHUB
+                        designcraft_engine::links::APP_PAGE
                     ),
                 }))
             }

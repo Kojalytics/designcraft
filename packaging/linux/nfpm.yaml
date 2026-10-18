@@ -14,7 +14,7 @@ section: graphics
 priority: optional
 maintainer: ${DESIGNCRAFT_MAINTAINER}
 vendor: Learning Machines LLC
-homepage: https://getartcraft.com/apps/designcraft
+homepage: https://www.kojalytics.com/koja-apps
 license: MIT OR Apache-2.0
 description: |-
   Open-source, native page layout and publishing that works the way InDesign users expect.
@@ -60,9 +60,9 @@ overrides:
       - libXrandr
       - mesa-vulkan-drivers
       - xdg-desktop-portal
-  # Named ai.storyteller.designcraft, not designcraft: the AUR already has designcraft, designcraft-bin and
+  # Named com.kojalytics.designcraft, not designcraft: the AUR already has designcraft, designcraft-bin and
   # designcraft-git, and an AUR helper treats any installed package with an AUR name as its own and
-  # rebuilds it on the next update. ArtCraft Launcher also uses the bundle id to tell this package
+  # rebuilds it on the next update. Kojalytics Launcher also uses the bundle id to tell this package
   # (which it updates with `pacman -U`) from an AUR build (which it leaves to the AUR helper).
   # nfpm has no optdepends for Arch, so the recommends above have no equivalent here.
   archlinux:

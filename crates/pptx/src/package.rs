@@ -237,7 +237,7 @@ pub fn write(p: &Package) -> Result<Vec<u8>> {
     put(
         "docProps/app.xml",
         format!(
-            "{DECL}<Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"><Application>DesignCraft</Application><Slides>{n}</Slides><PresentationFormat>Custom</PresentationFormat></Properties>"
+            "{DECL}<Properties xmlns=\"http://schemas.openxmlformats.org/officeDocument/2006/extended-properties\" xmlns:vt=\"http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes\"><Application>DesignKoja</Application><Slides>{n}</Slides><PresentationFormat>Custom</PresentationFormat></Properties>"
         ),
     );
 

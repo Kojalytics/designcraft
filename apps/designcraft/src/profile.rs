@@ -18,8 +18,8 @@ fn config_dir_with(os: &str, env: impl Fn(&str) -> Option<OsString>, exe_dir: Op
         return (!root.is_empty()).then(|| PathBuf::from(root));
     }
     match os {
-        "macos" => env("HOME").map(|p| PathBuf::from(p).join("Library/Application Support/DesignCraft")),
-        "windows" => env("APPDATA").map(|p| PathBuf::from(p).join("DesignCraft")),
+        "macos" => env("HOME").map(|p| PathBuf::from(p).join("Library/Application Support/DesignKoja")),
+        "windows" => env("APPDATA").map(|p| PathBuf::from(p).join("DesignKoja")),
         _ => {
             env("XDG_CONFIG_HOME").map(PathBuf::from).or_else(|| env("HOME").map(|p| PathBuf::from(p).join(".config"))).map(|p| p.join("designcraft"))
         }
@@ -164,13 +164,13 @@ mod tests {
     #[test]
     fn inside_a_macos_bundle_the_marker_sits_next_to_the_app() {
         let folder = install("bundle", |marker| std::fs::write(marker, "").unwrap());
-        let exe = folder.join("DesignCraft.app/Contents/MacOS");
+        let exe = folder.join("DesignKoja.app/Contents/MacOS");
         std::fs::create_dir_all(&exe).unwrap();
         assert_eq!(config_dir_with("macos", environment, Some(&exe)), Some(folder.join("DesignCraftData")));
         // a marker dropped inside the bundle is not looked at
         std::fs::remove_file(folder.join(PORTABLE_MARKER)).unwrap();
         std::fs::write(exe.join(PORTABLE_MARKER), "").unwrap();
-        assert_eq!(config_dir_with("macos", environment, Some(&exe)), Some("/user/Library/Application Support/DesignCraft".into()));
+        assert_eq!(config_dir_with("macos", environment, Some(&exe)), Some("/user/Library/Application Support/DesignKoja".into()));
         let _ = std::fs::remove_dir_all(&folder);
     }
 
@@ -179,7 +179,7 @@ mod tests {
         let plain = install("plain", |_| {});
         let folder = install("marker-folder", |marker| std::fs::create_dir(marker).unwrap());
         for exe in [&plain, &folder] {
-            assert_eq!(config_dir_with("windows", environment, Some(exe)), Some("/roaming/DesignCraft".into()));
+            assert_eq!(config_dir_with("windows", environment, Some(exe)), Some("/roaming/DesignKoja".into()));
             assert_eq!(recovery_dir_with(root_with(environment, Some(exe)), || Some("/existing/recovery".into())), Some("/existing/recovery".into()));
         }
         let _ = std::fs::remove_dir_all(&plain);
@@ -202,7 +202,7 @@ mod tests {
             let _ = std::fs::remove_dir_all(&exe);
             return;
         }
-        assert_eq!(config_dir_with("windows", environment, Some(&exe)), Some("/roaming/DesignCraft".into()));
+        assert_eq!(config_dir_with("windows", environment, Some(&exe)), Some("/roaming/DesignKoja".into()));
         assert_eq!(recovery_dir_with(root_with(environment, Some(&exe)), || Some("/user/recovery".into())), Some("/user/recovery".into()));
         assert_eq!(unwritable_portable_dir_with(environment, Some(&exe)), Some(exe.join("DesignCraftData")));
         set_mode(&exe, 0o755);
@@ -210,7 +210,7 @@ mod tests {
         let data = exe.join(PORTABLE_DATA_DIR);
         std::fs::create_dir(&data).unwrap();
         set_mode(&data, 0o555);
-        assert_eq!(config_dir_with("windows", environment, Some(&exe)), Some("/roaming/DesignCraft".into()));
+        assert_eq!(config_dir_with("windows", environment, Some(&exe)), Some("/roaming/DesignKoja".into()));
         assert_eq!(unwritable_portable_dir_with(environment, Some(&exe)), Some(data.clone()));
         // the override still wins, so there is nothing to warn about
         assert_eq!(
@@ -237,8 +237,8 @@ mod tests {
 
     #[test]
     fn unset_override_preserves_existing_platform_paths() {
-        assert_eq!(config_dir_with("macos", environment, None), Some("/user/Library/Application Support/DesignCraft".into()));
-        assert_eq!(config_dir_with("windows", environment, None), Some("/roaming/DesignCraft".into()));
+        assert_eq!(config_dir_with("macos", environment, None), Some("/user/Library/Application Support/DesignKoja".into()));
+        assert_eq!(config_dir_with("windows", environment, None), Some("/roaming/DesignKoja".into()));
         assert_eq!(config_dir_with("linux", environment, None), Some("/xdg-config/designcraft".into()));
         assert_eq!(
             config_dir_with("linux", |key| if key == "HOME" { environment(key) } else { None }, None),

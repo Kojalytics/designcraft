@@ -15,7 +15,7 @@
 //! designcraft-cli perf [--pages N] [--frames N] [--chars N] [--images N] [--runs N] [--strict]  # budgets on a synthetic stress document
 //! designcraft-cli bench FILE [--runs N]  # the same measurements on one document
 //! designcraft-cli validate-pdf FILE.pdf    # run the built-in PDF/X-4 conformance checks
-//! designcraft-cli links                   # Discord, website, app page and GitHub links
+//! designcraft-cli links                   # website and app page links
 //! designcraft-cli --version               # print the version
 //! ```
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
@@ -77,10 +77,8 @@ non-zero exit when a step fails."#;
 /// The links line under the usage block.
 fn usage_footer() -> String {
     format!(
-        "\nCommunity: {}  ·  {}  ·  {}",
-        designcraft_engine::links::DISCORD,
-        designcraft_engine::links::APP_PAGE,
-        designcraft_engine::links::GITHUB
+        "\nWebsite: {}",
+        designcraft_engine::links::APP_PAGE
     )
 }
 
@@ -124,7 +122,7 @@ fn main() -> ExitCode {
         Some("validate-pdf") => report(validate_pdf(args.get(1).map(String::as_str))),
         Some("links") => {
             use designcraft_engine::links::*;
-            outln!("Discord   {DISCORD}\nWebsite   {WEBSITE}\nApp page  {APP_PAGE}\nGitHub    {GITHUB}\nIssues    {ISSUES}");
+            outln!("Website   {WEBSITE}\nApp page  {APP_PAGE}\nIssues    {ISSUES}");
             ExitCode::SUCCESS
         }
         // Asking for help is not an error: it goes to stdout and succeeds. An unknown command
@@ -196,7 +194,7 @@ so drop --connect (or use --connect without the roots)"
             let addr = control_addr(&c);
             Box::new(
                 Remote::connect(&addr)
-                    .map_err(|e| format!("cannot connect to the DesignCraft app at {addr}: {e} (start it with `designcraft --control PORT`)"))?,
+                    .map_err(|e| format!("cannot connect to the DesignKoja app at {addr}: {e} (start it with `designcraft --control PORT`)"))?,
             )
         }
         None => {
@@ -472,7 +470,7 @@ fn script(args: &[String]) -> Result<(), String> {
             let addr = control_addr(c);
             Box::new(
                 Remote::connect(&addr)
-                    .map_err(|e| format!("cannot connect to the DesignCraft app at {addr}: {e} (start it with `designcraft --control PORT`)"))?,
+                    .map_err(|e| format!("cannot connect to the DesignKoja app at {addr}: {e} (start it with `designcraft --control PORT`)"))?,
             )
         }
         None => Box::new(Headless::with_document()),
@@ -533,7 +531,7 @@ fn app(args: &[String]) -> Result<(), String> {
     }
     let addr = control_addr(&port);
     let mut r = Remote::connect(&addr)
-        .map_err(|e| format!("cannot connect to the DesignCraft app at {addr}: {e} (start it with `designcraft --control {port}`)"))?;
+        .map_err(|e| format!("cannot connect to the DesignKoja app at {addr}: {e} (start it with `designcraft --control {port}`)"))?;
     let json_arg =
         |s: Option<&String>| -> Result<Value, String> { s.map_or(Ok(json!({})), |t| serde_json::from_str(t).map_err(|e| format!("bad JSON: {e}"))) };
     let out = match method {

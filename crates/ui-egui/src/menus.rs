@@ -22,7 +22,7 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
     ("app.placeDialog", "Place…", Some("Cmd+D"), "{}"),
     ("app.saveDialog", "Save As…", Some("Cmd+Shift+S"), "{}"),
     ("app.save", "Save", Some("Cmd+S"), "{}"),
-    ("app.quit", "Quit DesignCraft", Some("Cmd+Q"), "{} — close the window; each document with unsaved changes asks first"),
+    ("app.quit", "Quit DesignKoja", Some("Cmd+Q"), "{} — close the window; each document with unsaved changes asks first"),
     ("app.saveCopyDialog", "Save a Copy…", Some("Cmd+Alt+S"), "{} — choose where to write a copy (the document stays as it is)"),
     ("app.loadSwatches", "Load Swatches…", None, "{} — pick a swatch exchange (.ase) file"),
     (
@@ -278,15 +278,13 @@ pub const UI_COMMANDS: &[(&str, &str, Option<&str>, &str)] = &[
         "{on?: bool, at?: [x, y] (points from the canvas's top-left)} — the Contextual Task Bar stays where it is (or at `at`) instead of following the selection; with neither, toggles",
     ),
     ("window.taskBarReset", "Reset Bar Position", None, "{} — the Contextual Task Bar follows the selection again, under it"),
-    ("help.discord", "Join the ArtCraft Discord…", None, "{} — opens https://discord.gg/artcraft in the browser"),
-    ("help.appPage", "DesignCraft Website…", None, "{} — opens https://getartcraft.com/apps/designcraft"),
-    ("help.github", "DesignCraft on GitHub…", None, "{} — opens https://github.com/storytold/designcraft"),
-    ("help.issues", "Report an Issue…", None, "{} — opens the GitHub issue tracker"),
-    ("help.website", "ArtCraft Website…", None, "{} — opens https://getartcraft.com"),
-    ("help.app", "ArtCraft App Page…", None, "{app} — opens https://getartcraft.com/apps/{app} (e.g. photocraft)"),
+    ("help.appPage", "DesignKoja Website…", None, "{} — opens https://www.kojalytics.com/koja-apps"),
+    ("help.issues", "Report an Issue…", None, "{} — opens https://www.kojalytics.com/contact"),
+    ("help.website", "Kojalytics Website…", None, "{} — opens https://kojalytics.com"),
+    ("help.app", "Kojalytics App Page…", None, "{app} — opens https://kojalytics.com/apps/{app} (e.g. photocraft)"),
     (
         "help.about",
-        "About DesignCraft",
+        "About DesignKoja",
         None,
         "{open?: true, tab?: \"about\"|\"contributors\"|\"models\"} — the About window: splash with community links, contributor and model credits (open: false closes it)",
     ),
@@ -907,10 +905,7 @@ pub const MENUS: &[(&str, &[&str])] = &[
     (
         "Help",
         &[
-            "ui:help.discord",
-            "-",
             "ui:help.appPage",
-            "ui:help.github",
             "ui:help.issues",
             "ui:help.website",
             "-",
@@ -2293,8 +2288,7 @@ pub enum AppMenuItem {
 
 /// The macOS application menu. Settings… is `app.preferences`, which `native_menu_tree` leaves out of Edit.
 pub const MAC_APP_MENU: &[AppMenuItem] = &[
-    AppMenuItem::Cmd { id: "dc-about", label: "About DesignCraft", command: "help.about" },
-    AppMenuItem::Cmd { id: "dc-discord", label: "Join the ArtCraft Discord…", command: "help.discord" },
+    AppMenuItem::Cmd { id: "dc-about", label: "About DesignKoja", command: "help.about" },
     AppMenuItem::Sep,
     AppMenuItem::Cmd { id: "dc-settings", label: "Settings…", command: "app.preferences" },
     AppMenuItem::Sep,
@@ -2305,7 +2299,7 @@ pub const MAC_APP_MENU: &[AppMenuItem] = &[
     AppMenuItem::ShowAll,
     AppMenuItem::Sep,
     // Not the predefined Quit: it terminates the app at once, past the unsaved-changes prompt.
-    AppMenuItem::Cmd { id: "dc-quit", label: "Quit DesignCraft", command: "app.quit" },
+    AppMenuItem::Cmd { id: "dc-quit", label: "Quit DesignKoja", command: "app.quit" },
 ];
 
 /// A label as the macOS menu bar library takes it: it reads "&" as a mnemonic marker and drops
