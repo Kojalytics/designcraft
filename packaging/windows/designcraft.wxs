@@ -11,13 +11,13 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <Package
       Name="DesignKoja"
-      Manufacturer="Learning Machines LLC"
+      Manufacturer="Kojalytics"
       Version="$(var.Version)"
-      UpgradeCode="49E87D30-BB68-4896-AA1D-F45C833CFC3C"
+      UpgradeCode="8FD41DE1-1097-52D5-8DCC-08F4F155234D"
       Scope="perMachine"
       Compressed="yes"
       Language="1033">
-    <SummaryInformation Description="DesignKoja page layout and publishing" Manufacturer="Learning Machines LLC" />
+    <SummaryInformation Description="DesignKoja page layout and publishing" Manufacturer="Kojalytics" />
     <!-- Same-version upgrades let successive pre-releases of one X.Y.Z replace each other
          (MSI versions are numeric, so 1.2.3-rc.1 and 1.2.3-rc.2 are both 1.2.3). -->
     <MajorUpgrade AllowSameVersionUpgrades="yes"
@@ -47,7 +47,7 @@
 
   <Fragment>
     <ComponentGroup Id="DesigncraftFiles" Directory="INSTALLFOLDER">
-      <Component Id="DesigncraftApp" Guid="DE018EF3-EE87-4E36-9F76-0B7B060A195E">
+      <Component Id="DesigncraftApp" Guid="B7F9C8F6-2E84-59A5-925F-76CA4945626F">
         <File Id="DesigncraftExe" Source="$(var.BinDir)\designcraft.exe" KeyPath="yes">
           <Shortcut Id="StartMenuShortcut" Directory="ProgramMenuFolder" Name="DesignKoja"
               Description="DesignKoja page layout and publishing" WorkingDirectory="INSTALLFOLDER" Advertise="yes"

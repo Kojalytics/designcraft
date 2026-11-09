@@ -202,9 +202,9 @@
     <?endif ?>
     <ComponentGroup Id="CraftInstallerSettings" Directory="INSTALLFOLDER">
       <Component Id="CraftInstallerSettingsEntry" Guid="*">
-        <RegistryKey Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\Craft.designcraft" ForceDeleteOnUninstall="yes">
-          <!-- Legacy Launchers match the canonical MSI name exactly; keep this alias distinct. -->
-          <RegistryValue Name="DisplayName" Type="string" Value="[ProductName] (Craft Apps)" KeyPath="yes" />
+        <RegistryKey Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\Kojalytics.designcraft" ForceDeleteOnUninstall="yes">
+          <!-- The Kojalytics Launcher reads only MSI product-code entries, so this one keeps the plain name. -->
+          <RegistryValue Name="DisplayName" Type="string" Value="[ProductName]" KeyPath="yes" />
           <RegistryValue Name="DisplayVersion" Type="string" Value="[ProductVersion]" />
           <RegistryValue Name="Publisher" Type="string" Value="[Manufacturer]" />
           <RegistryValue Name="DisplayIcon" Type="string" Value="&quot;[INSTALLFOLDER]designcraft.exe&quot;,0" />
@@ -220,7 +220,7 @@
       </Component>
       <!-- Preserve the app-owned ARPNOMODIFY policy instead of inventing a new default. -->
       <Component Id="CraftInstallerSettingsNoModify" Guid="*" Condition="ARPNOMODIFY = &quot;1&quot;">
-        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\Craft.designcraft"
+        <RegistryValue Root="HKLM" Key="Software\Microsoft\Windows\CurrentVersion\Uninstall\Kojalytics.designcraft"
             Name="NoModify" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </ComponentGroup>
